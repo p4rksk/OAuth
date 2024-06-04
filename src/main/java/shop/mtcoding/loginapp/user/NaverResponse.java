@@ -6,7 +6,7 @@ import lombok.Data;
 import java.sql.Time;
 import java.sql.Timestamp;
 
-public class KakaoResponse {
+public class NaverResponse {
 
     @Data // getter, setter
     public static class TokenDTO {
@@ -24,38 +24,30 @@ public class KakaoResponse {
     }
 
     @Data
-    public static class KakaoUserDTO {
-        private Long id;
-        @JsonProperty("connected_at")
-        private Timestamp connectedAt;
-        private Properties properties;
+    public static class NaverUserDTO {
+        private Response response;
 
         @Data
-        public class Properties {
-            private String nickname;
+       public class Response{
+            private String id;
+            private String gender;
+            private String email;
+            private String name;
         }
-
-
 
     }
 
-//    {
-//        "access_token": "cF8KxpGGr_PZ6RQhX6VW7qy9kAcKPhMJAAAAAQo9c-wAAAGPzRoMqcYNwJ_muSR4",
-//        "token_type": "bearer",
-//        "refresh_token": "CkRmjTlcVkiVgvedDVGT7eCd9LK-T0UbAAAAAgo9c-wAAAGPzRoMpsYNwJ_muSR4",
-//        "expires_in": 21599,
-//        "scope": "profile_nickname",
-//        "refresh_token_expires_in": 5183999
+//{
+//    "resultcode": "00",
+//    "message": "success",
+//    "response": {
+//        "id": "7EWBG1M6Sx6cqLSpsECUTZB8-bhXnvLEV6RUBjcKYKE",
+//        "gender": "M",
+//        "email": "yeeun0118s@naver.com",
+//        "name": "박선규",
 //    }
+//}
 
-
-//    {
-//        "id":3506279095,
-//        "connected_at":"2024-05-31T05:23:08Z",
-//        "properties":{
-//            "nickname":"최주호"
-//        }
-//    }
 }
 
 

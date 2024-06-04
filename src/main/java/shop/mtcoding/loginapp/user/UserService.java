@@ -43,7 +43,7 @@ public class UserService {
         }
     }
 
-    public User 카카오로그인(String code) {
+    public User  네이버로그인(String code) {
         // 1. code로 카카오에서 토큰 받기 (위임완료) - oauth2.0
 
         // 1.1 RestTemplate 설정
@@ -56,20 +56,22 @@ public class UserService {
         // 1.3 http body 설정
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
-        body.add("client_id", "3d03bec0f109fbfea32461ee7fd4f9a0");
-        body.add("redirect_uri", "http://localhost:8080/oauth/callback");
+        body.add("client_id", "au4L2O2INJwUFl915A_J");
+        body.add("client_secret", "xiCngRegDl");
         body.add("code", code);
+        body.add("state", "1234");
+        body.add("redirect_uri", "http://localhost:8080/oauth/callback");
 
         // 1.4 body+header 객체 만들기
         HttpEntity<MultiValueMap<String, String>> request =
                 new HttpEntity<>(body, headers);
 
         // 1.5 api 요청하기 (토큰 받기)
-        ResponseEntity<KakaoResponse.TokenDTO> response = rt.exchange(
-                "https://kauth.kakao.com/oauth/token",
+        ResponseEntity<NaverResponse.TokenDTO> response = rt.exchange(
+                "https://nid.naver.com/oauth2.0/token",
                 HttpMethod.POST,
                 request,
-                KakaoResponse.TokenDTO.class);
+                NaverResponse.TokenDTO.class);
 
         // 1.6 값 확인
         System.out.println(response.getBody().toString());
@@ -77,21 +79,21 @@ public class UserService {
         // 2. 토큰으로 사용자 정보 받기 (PK, Email)
         HttpHeaders headers2 = new HttpHeaders();
         headers2.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
-        headers2.add("Authorization", "Bearer "+response.getBody().getAccessToken());
+        headers2.add("Authorization", "bearer "+response.getBody().getAccessToken());
 
         HttpEntity<MultiValueMap<String, String>> request2 =
                 new HttpEntity<>(headers2);
 
-        ResponseEntity<KakaoResponse.KakaoUserDTO> response2 = rt.exchange(
-                "https://kapi.kakao.com/v2/user/me",
+        ResponseEntity<NaverResponse.NaverUserDTO> response2 = rt.exchange(
+                "https://openapi.naver.com/v1/nid/me",
                 HttpMethod.GET,
                 request2,
-                KakaoResponse.KakaoUserDTO.class);
+                NaverResponse.NaverUserDTO.class);
 
         System.out.println("response2 : "+response2.getBody().toString());
 
         // 3. 해당정보로 DB조회 (있을수, 없을수)
-        String username = "kakao_"+response2.getBody().getId();
+        String username = "Naver_"+response2.getBody().getResponse().getName();
         User userPS = userRepository.findByUsername(username);
 
         // 4. 있으면? - 조회된 유저정보 리턴
@@ -108,8 +110,8 @@ public class UserService {
             User user = User.builder()
                     .username(username)
                     .password(UUID.randomUUID().toString())
-                    .email(response2.getBody().getProperties().getNickname()+"@nate.com")
-                    .provider("kakao")
+                    .email(response2.getBody().getResponse().getEmail())
+                    .provider("Naver")
                     .build();
             User returnUser = userRepository.save(user);
             return returnUser;
